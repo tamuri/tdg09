@@ -1,0 +1,30 @@
+These files can be used to recreate some of the results reported in
+
+Tamuri AU, dos Reis M, Hay AJ, Goldstein RA (2009) Identifying Changes in 
+Selective Constraints: Host Shifts in Influenza. PLoS Comput Biol 5(11): e1000564 
+doi:10.1371/journal.pcbi.1000564
+
+Please cite this work if you use any of this material in your own publications.
+
+You'll need a recent version of the JRE to run the program. The JDK and the 
+'ant' build tool if you want to use the build.xml file to build files from 
+source. However, a binary is included.
+
+Description of directories:
+build - Used by ant for compiled source files
+dist - The compiled tdg09.jar library
+etc - Protein sequence alignments and tree files for influenza genes
+lib - Libraries used by tdg09
+src - Java source files for tdg09
+
+To run the program, select the appropriate (matching) alignment and tree files
+and pass these as command-line arguments to the run.sh program. For example,
+
+./run.sh etc/H1.faa etc/H1.tree
+
+for the H1 gene. Or
+
+./run.sh etc/MP.faa etc/MP.tree
+
+for the MP gene.
+
