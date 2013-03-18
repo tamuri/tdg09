@@ -4,6 +4,7 @@ import flanagan.math.Minimisation;
 import org.apache.commons.lang.ArrayUtils;
 import pal.alignment.Alignment;
 import pal.tree.Tree;
+import tdg09.utils.CoreUtils;
 
 /**
  * @author Asif Tamuri <atamuri@nimr.mrc.ac.uk>
@@ -17,8 +18,8 @@ import pal.tree.Tree;
 public class MainAvHu09 {
 
     public static void main(String[] args) {
-        Alignment alignment = FileUtils.readAlignment(args[0]);
-        Tree tree = FileUtils.readTree(args[1]);
+        Alignment alignment = CoreUtils.readAlignment(args[0]);
+        Tree tree = CoreUtils.readTree(args[1]);
 
         for (int site = 1; site < alignment.getSiteCount() + 1; site++) {
             System.out.printf("Site: %s\n", site);

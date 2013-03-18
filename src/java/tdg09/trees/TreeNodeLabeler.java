@@ -1,6 +1,7 @@
 package tdg09.trees;
 
 import pal.tree.*;
+import tdg09.utils.CoreUtils;
 
 import java.io.*;
 import java.util.*;
@@ -15,19 +16,26 @@ import java.util.*;
  * doi:10.1371/journal.pcbi.1000564
  */
 public class TreeNodeLabeler {
-        public static void main(String[] args) {
+    public static void main(String[] args) {
         TreeNodeLabeler m = new TreeNodeLabeler();
-        m.run(args[0]);
-    }
 
-    private void run(String fileIn) {
-        Tree t;
+        Tree t = CoreUtils.readTree(args[0]);
+        Tree out = m.label(t);
+
+        FileWriter fw;
         try {
-            t = TreeTool.readTree(new BufferedReader(new FileReader(fileIn)));
+            fw = new FileWriter(args[0] + ".out");
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             throw new RuntimeException();
         }
+
+        PrintWriter pw = new PrintWriter(fw);
+        TreeUtils.printNH(out, pw);
+        pw.close();
+    }
+
+    public SimpleTree label(Tree t) {
 
         SimpleTree st = new SimpleTree(t);
         List<Node> unknownNodes = new ArrayList<Node>();
@@ -42,7 +50,7 @@ public class TreeNodeLabeler {
         int postUnknownNodeCount = -1;
 
         while (unknownNodes.size() > 0 && preUnknownNodeCount != postUnknownNodeCount) {
-            System.out.printf("%s != %s\n", preUnknownNodeCount, postUnknownNodeCount);
+            // System.out.printf("Branch %s..%s different.\n", preUnknownNodeCount, postUnknownNodeCount);
             preUnknownNodeCount = unknownNodes.size();
             // loop through each of the unknown nodes
             for (Node n : unknownNodes) {
@@ -64,9 +72,9 @@ public class TreeNodeLabeler {
                 }
 
                 // list all the possible names for this node
-                System.out.printf("%s = ", n.getNumber());
-                printStringSet(s);
-                System.out.printf("\n");
+                if (s.size() > 1) {
+                    System.out.printf("# Node %s from %s resolved\n", n.getNumber(), s.toString());
+                }
 
                 if (s.size() == 1) {
                     n.getIdentifier().setName(s.iterator().next());
@@ -88,29 +96,22 @@ public class TreeNodeLabeler {
             if (n.getParent() != null) {
                 String parentNodeName = n.getParent().getIdentifier().getName();
                 if (parentNodeName != null && parentNodeName.length() > 0) {
-                    n.getIdentifier().setName(parentNodeName.substring(0,2) + "_HS");
+                    n.getIdentifier().setName(parentNodeName.substring(0,2) + "_GS");
                 }
             } else {
-                n.getIdentifier().setName("ROOT");
+                // n.getIdentifier().setName("ROOT");
             }
         }
-     
-        FileWriter fw;
-        try {
-            fw = new FileWriter(fileIn + ".out");
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            throw new RuntimeException();
-        }
 
-        PrintWriter pw = new PrintWriter(fw);
-        TreeUtils.printNH(st, pw);
-        pw.close();
+
+        return st;
+
+
     }
 
     private void printStringSet(Set<String> set) {
         for (String s : set) {
-            System.out.printf("%s ", s);
+            System.out.printf("[%s] ", s);
         }
     }
 }

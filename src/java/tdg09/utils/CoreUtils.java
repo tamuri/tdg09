@@ -1,5 +1,6 @@
-package tdg09.models;
+package tdg09.utils;
 
+import com.google.common.collect.Sets;
 import pal.alignment.Alignment;
 import pal.alignment.AlignmentReaders;
 import pal.datatype.DataTypeTool;
@@ -8,17 +9,13 @@ import pal.tree.Tree;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.Set;
 
 /**
- * @author Asif Tamuri <atamuri@nimr.mrc.ac.uk>
- * @version 1.0
- *
- * Tamuri AU, dos Reis M, Hay AJ, Goldstein RA (2009)
- * Identifying Changes in Selective Constraints: Host Shifts in Influenza.
- * PLoS Comput Biol 5(11): e1000564.
- * doi:10.1371/journal.pcbi.1000564
+ * Author: Asif Tamuri (atamuri@ebi.ac.uk)
+ * Date: 18/03/2013 16:48
  */
-public class FileUtils {
+public class CoreUtils {
     public static Tree readTree(String filePath) {
         Tree tree;
         try {
@@ -38,4 +35,19 @@ public class FileUtils {
         }
         return a;
     }
+
+    public static boolean isTreeAndAlignmentValid(Tree tree, Alignment alignment) {
+        Set<String> nodes = Sets.newHashSet();
+        for (int i = 0; i < tree.getExternalNodeCount(); i++) {
+            nodes.add(tree.getExternalNode(i).getIdentifier().getName());
+        }
+
+        Set<String> seqs = Sets.newHashSet();
+        for (int i = 0; i < alignment.getSequenceCount(); i++) {
+            seqs.add(alignment.getIdentifier(i).getName());
+        }
+
+        return !(seqs.size() != nodes.size() || Sets.symmetricDifference(seqs, nodes).size() > 0);
+    }
+
 }

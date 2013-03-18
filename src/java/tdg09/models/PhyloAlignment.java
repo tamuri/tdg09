@@ -92,7 +92,7 @@ public class PhyloAlignment {
 
     }
 
-    protected int getNumberOfActiveAminoAcids() {
+    public int getNumberOfActiveAminoAcids() {
         return activeAminoAcidCount;
     }
 
