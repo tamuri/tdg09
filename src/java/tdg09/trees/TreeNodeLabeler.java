@@ -1,4 +1,4 @@
-package trees;
+package tdg09.trees;
 
 import pal.tree.*;
 

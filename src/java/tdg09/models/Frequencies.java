@@ -1,4 +1,4 @@
-package models;
+package tdg09.models;
 
 import org.apache.commons.lang.ArrayUtils;
 

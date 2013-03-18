@@ -1,4 +1,4 @@
-package models;
+package tdg09.models;
 
 import pal.alignment.Alignment;
 import pal.alignment.AlignmentReaders;

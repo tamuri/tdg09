@@ -1,4 +1,4 @@
-package models;
+package tdg09.models;
 
 import pal.substmodel.AbstractRateMatrix;
 import pal.substmodel.RateMatrix;
