@@ -25,6 +25,7 @@ public class SiteAnalyser implements Callable<Void> {
     }
 
         public Void call() throws Exception {
+            System.out.printf("Site: %s\n", site);
             PhyloAlignment phyloAlignment = new PhyloAlignment(alignment, tree, site, Constants.DELETE_SINGLES);
 
             if (phyloAlignment.getNumberOfActiveAminoAcids() == 0) {

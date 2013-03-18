@@ -22,4 +22,6 @@ public class Options {
 
     @Parameter(required = true, names = "-groups", variableArity = true)
     public List<String> groups;
+
+    // TODO: have a 'name' for each run, like RAxML
 }

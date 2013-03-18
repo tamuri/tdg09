@@ -1,8 +1,10 @@
 package tdg09;
 
 import com.beust.jcommander.JCommander;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang.ArrayUtils;
 import pal.alignment.Alignment;
 import pal.tree.Node;
 import pal.tree.Tree;
@@ -10,8 +12,10 @@ import pal.tree.TreeUtils;
 import tdg09.trees.TreeNodeLabeler;
 import tdg09.utils.CoreUtils;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -32,19 +36,22 @@ public class Analyse {
     }
 
     private void run(String[] args) {
+        // TODO: print output to console AND a file with the 'name' prefix, ala RAxML
+        System.out.printf("StartTime: %s\n", new Timestamp(System.currentTimeMillis()));
+        System.out.printf("WorkingDirectory: %s\n", System.getProperty("user.dir"));
+        System.out.printf("Options: %s\n\n", Joiner.on(" ").join(Lists.newArrayList(args)));
 
         // Parse the command-line options
         JCommander jc = new JCommander(options);
         jc.parse(args);
 
         // Load the tree and alignment
-        System.out.printf("TreeFile:\n\t%s\n", options.treePath);
+        System.out.printf("TreeFile: %s\n", new File(options.treePath).getAbsolutePath());
         Tree tree = CoreUtils.readTree(options.treePath);
 
-        System.out.printf("AlignmentFile:\n\t%s\n", options.alignmentPath);
+        System.out.printf("AlignmentFile: %s\n\n", new File(options.alignmentPath).getAbsolutePath());
         Alignment alignment = CoreUtils.readAlignment(options.alignmentPath);
 
-        System.out.println();
 
         validate(tree, alignment);
 
@@ -91,6 +98,7 @@ public class Analyse {
 
         pool.shutdown();
 
+
     }
 
 
@@ -100,6 +108,8 @@ public class Analyse {
         if (!CoreUtils.isTreeAndAlignmentValid(tree, alignment)) {
             System.out.println("ERROR: The tree and alignment do not have the same taxa.");
             System.exit(1);
+        } else {
+            System.out.printf("Alignment:\n\tSequenceCount: %s\n\tSiteCount: %s\n\n", alignment.getSequenceCount(), alignment.getSiteCount());
         }
 
         // 2. Check that all taxa have an assigned group and all groups are used
@@ -132,6 +142,9 @@ public class Analyse {
                 options.groups.remove(s);
             }
         }
+
+        System.out.printf("Groups: %s\n\n", Joiner.on(", ").join(options.groups));
+
     }
 
     private void printGroupChanges(Node node) {
