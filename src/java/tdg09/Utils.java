@@ -52,11 +52,15 @@ public class Utils {
         return !(seqs.size() != nodes.size() || Sets.symmetricDifference(seqs, nodes).size() > 0);
     }
 
-    public static <T> Comparator<T> getDoubleComparator(final String name, final T clazz) {
+    /**
+     * Returns a generics Comparator for comparing a double field in class T.
+     * Usage: Collections.sort(listOfMyClass, Utils.doubleComparator("myDoubleField", MyClass.class));
+     */
+    public static <T> Comparator<T> doubleComparator(final String name, final Class<T> clazz) {
         return new Comparator<T>() {
             public int compare(T o1, T o2) {
                 try {
-                    Field f = clazz.getClass().getField(name);
+                    Field f = clazz.getField(name);
 
                     double d1 = f.getDouble(o1);
                     double d2 = f.getDouble(o2);

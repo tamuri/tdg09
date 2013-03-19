@@ -2,6 +2,7 @@ package tdg09;
 
 import com.beust.jcommander.JCommander;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.yaml.snakeyaml.Yaml;
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -82,38 +84,36 @@ public class Analyse {
 
         StringWriter sw = new StringWriter();
         TreeUtils.printNH(tree, new PrintWriter(sw));
-        System.out.printf("LabelledTree:\n\t%s\n", sw.toString().replaceAll("\n", ""));
+        System.out.printf("LabelledTree: %s\n", sw.toString().replaceAll("\n", ""));
         System.out.println();
 
         // We're now ready to run
         ExecutorService pool = Executors.newFixedThreadPool(options.threads);
-        List<Future<Result>> futures = Lists.newArrayList();
+        CompletionService<Result> ecs = new ExecutorCompletionService<Result>(pool);
 
-        for (int i = 1; i <= alignment.getSiteCount(); i++) {
-        //for (int i = 1; i <= 10; i++) {
-            futures.add(pool.submit(new SiteAnalyser(alignment, tree, i, options.groups)));
-        }
-
-        List<Result> results = Lists.newArrayList();
-
-        try {
-            for (Future<Result> future : futures) {
-                results.add(future.get());
-                future.get().toYaml();
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+       for (int i = 1; i <= alignment.getSiteCount(); i++) {
+            ecs.submit(new SiteAnalyser(alignment, tree, i, options.groups));
         }
 
         pool.shutdown();
+
+        List<Result> results = Lists.newArrayList();
+        try {
+            while (!pool.isTerminated()) {
+                Result r = ecs.take().get();
+                results.add(r);
+                r.toYaml();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         System.out.print("\n---\n\n");
         doLRT(results);
 
         System.out.print("\n---\n\n");
-        printSummary(results);
+        fullResults(results);
 
         System.out.println();
         System.out.printf("EndTime: %s\n", new Timestamp(System.currentTimeMillis()));
@@ -121,8 +121,8 @@ public class Analyse {
         System.out.println("...");
     }
 
-    private void printSummary(List<Result> results) {
-        System.out.println("# Other information");
+    private void fullResults(List<Result> results) {
+        System.out.println("# Complete");
         System.out.println();
 
         List<Integer> sites = Lists.newArrayList();
@@ -130,6 +130,30 @@ public class Analyse {
         System.out.println("ConservedPositions:");
         System.out.printf ("    Count: %s\n", sites.size());
         System.out.printf ("    Sites: %s\n", new Yaml().dump(sites));
+
+        System.out.println();
+
+        System.out.println("# Ordered by site");
+        Collections.sort(results, Utils.doubleComparator("site", Result.class));
+        DecimalFormat df = new DecimalFormat("###0.000000");
+
+        System.out.println("# Site, WAG+ssF params, WAG+ssF lnL, WAG+lssF params, WAG+lssF params, delta lnL, dof, LRT, FDR");
+        for (Result r : results) {
+            if (r.models != null) {
+                System.out.printf("- %4d, %2d, %s, %2d, %s, %s, %2d, %.7f, %.7f%n",
+                        r.site,
+                        r.models.get(0).parameters,
+                        Strings.padStart(df.format(r.models.get(0).lnL), 11, ' '),
+                        r.models.get(1).parameters,
+                        Strings.padStart(df.format(r.models.get(1).lnL), 11, ' '),
+                        Strings.padStart(df.format(r.models.get(1).lnL - r.models.get(0).lnL), 10, ' '),
+                        r.models.get(1).parameters - r.models.get(0).parameters,
+                        r.lrt,
+                        r.fdr);
+            } else {
+                System.out.printf("- %4d%n", r.site);
+            }
+        }
     }
 
     private void doLRT(List<Result> results) {
@@ -149,7 +173,7 @@ public class Analyse {
         }
 
         // order by likelihood ratio test p-value
-        Collections.sort(polymorphicSites, Utils.getDoubleComparator("lrt", results.get(0)));
+        Collections.sort(polymorphicSites, Utils.doubleComparator("lrt", Result.class));
 
         // calculate false discovery rate (naive method)
         for (int i = 0; i < polymorphicSites.size(); i++) {
@@ -159,13 +183,15 @@ public class Analyse {
         }
 
         // order by false discovery rate
-        Collections.sort(polymorphicSites, Utils.getDoubleComparator("fdr", results.get(0)));
+        Collections.sort(polymorphicSites, Utils.doubleComparator("fdr", Result.class));
 
-        System.out.println("# Site, delta lnL,  dof, P-value,   FDR");
+        DecimalFormat df = new DecimalFormat("##0.000000");
+
+        System.out.println("# Site,  delta lnL,  dof, P-value,   FDR");
         for (Result r : polymorphicSites) {
-            System.out.printf("- %1$4d, %2$3.7f,  %3$s,   %4$.7f, %5$.7f%n",
+            System.out.printf("- %4d, %s,  %s,   %.7f, %.7f%n",
                     r.site,
-                    r.models.get(1).lnL - r.models.get(0).lnL,
+                    Strings.padStart(df.format(r.models.get(1).lnL - r.models.get(0).lnL), 10, ' '),
                     r.models.get(1).parameters - r.models.get(0).parameters,
                     r.lrt,
                     r.fdr);
