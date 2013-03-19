@@ -26,7 +26,7 @@ public class Result {
         this.models = models;
     }
 
-    public void toYaml() {
+    public String toYaml() {
         class PropertyOrder extends PropertyUtils {
             @Override
             protected Set<Property> createPropertySet(Class<? extends Object> type, BeanAccess bAccess) throws IntrospectionException {
@@ -51,9 +51,8 @@ public class Result {
 
         Representer representer = new Representer();
         representer.setPropertyUtils(new PropertyOrder());
-
         Yaml yaml = new Yaml(representer);
-        System.out.println(yaml.dump(this));
+        return yaml.dump(this);
     }
 
      public static class Model {

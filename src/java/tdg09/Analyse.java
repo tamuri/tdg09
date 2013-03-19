@@ -4,6 +4,7 @@ import com.beust.jcommander.JCommander;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.yaml.snakeyaml.Yaml;
 import pal.alignment.Alignment;
@@ -84,14 +85,15 @@ public class Analyse {
 
         StringWriter sw = new StringWriter();
         TreeUtils.printNH(tree, new PrintWriter(sw));
-        System.out.printf("LabelledTree: >\n\t%s\n", sw.toString().replaceAll("\n", "\n\t"));
-        System.out.print("\n---\n\n");
+        System.out.printf("LabelledTree: >\n  %s\n", sw.toString().replaceAll("\n", "\n  "));
+
+        System.out.println("# " + Strings.repeat("-", 80) + "\n");
 
         // We're now ready to run
         ExecutorService pool = Executors.newFixedThreadPool(options.threads);
         CompletionService<Result> ecs = new ExecutorCompletionService<Result>(pool);
 
-       for (int i = 1; i <= alignment.getSiteCount(); i++) {
+       for (int i = 1; i <= 10; i++) {
             ecs.submit(new SiteAnalyser(alignment, tree, i, options.groups));
         }
 
@@ -102,34 +104,48 @@ public class Analyse {
             while (!pool.isTerminated()) {
                 Result r = ecs.take().get();
                 results.add(r);
-                r.toYaml();
+                System.out.printf("# site %s complete", r.site);
+                if (r.models != null) if (!r.models.get(0).converged || !r.models.get(1).converged)
+                    System.out.print(" (warning: did not converge)");
+                System.out.println();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-
-        System.out.print("\n---\n\n");
-        doLRT(results);
-
-        System.out.print("\n---\n\n");
-        fullResults(results);
-
         System.out.println();
+        System.out.println("# " + Strings.repeat("-", 80) + "\n");
+
+
+        doLRT(results);
+        System.out.println();
+
+        fullResults(results);
+        System.out.println();
+
+
+        System.out.println("# " + Strings.repeat("-", 80) + "\n");
+
+        Map<String, List<Result>> m = Maps.newHashMap();
+        m.put("SiteResults", results);
+        Yaml yaml = new Yaml();
+        System.out.println(yaml.dump(m));
+
+
         System.out.printf("EndTime: %s\n", new Timestamp(System.currentTimeMillis()));
+        System.out.println();
 
         System.out.println("...");
     }
 
     private void fullResults(List<Result> results) {
-        System.out.println("# Ordered by site");
         Collections.sort(results, Utils.doubleComparator("site", Result.class));
         DecimalFormat df = new DecimalFormat("###0.000000");
 
-        System.out.println("# Site, WAG+ssF params, WAG+ssF lnL, WAG+lssF params, WAG+lssF params, delta lnL, dof, LRT, FDR");
+        System.out.println("FullResults:\n# Site, WAG+ssF params, WAG+ssF lnL, WAG+lssF params, WAG+lssF params, delta lnL, dof, LRT, FDR");
         for (Result r : results) {
             if (r.models != null) {
-                System.out.printf("- %4d, %2d, %s, %2d, %s, %s, %2d, %.7f, %.7f%n",
+                System.out.printf("- [ %4d, %2d, %s, %2d, %s, %s, %2d, %.7f, %.7f ]%n",
                         r.site,
                         r.models.get(0).parameters,
                         Strings.padStart(df.format(r.models.get(0).lnL), 11, ' '),
@@ -140,14 +156,12 @@ public class Analyse {
                         r.lrt,
                         r.fdr);
             } else {
-                System.out.printf("- %4d%n", r.site);
+                System.out.printf("- [ %4d, NA,          NA, NA,          NA,         NA, NA,        NA,        NA ]%n", r.site);
             }
         }
 
-        System.out.print("\n---\n\n");
-
-        System.out.println("# Misc.");
         System.out.println();
+        System.out.println("# Misc.");
         List<Integer> sites = Lists.newArrayList();
         for (Result r : results) if (r.models == null) sites.add(r.site);
         System.out.println("ConservedPositions:");
@@ -157,9 +171,6 @@ public class Analyse {
     }
 
     private void doLRT(List<Result> results) {
-        System.out.println("# Likelihood ratio test:");
-        System.out.println();
-
         List<Result> polymorphicSites = Lists.newArrayList();
 
         for (Result r : results) {
@@ -169,6 +180,9 @@ public class Analyse {
                 r.lrt = LikelihoodRatioTest.getSignificance(
                         r.models.get(1).lnL - r.models.get(0).lnL, // delta lnL
                         r.models.get(1).parameters - r.models.get(0).parameters); // degrees of freedom
+            } else {
+                r.lrt = 1.0;
+                r.fdr = 1.0;
             }
         }
 
@@ -187,9 +201,9 @@ public class Analyse {
 
         DecimalFormat df = new DecimalFormat("##0.000000");
 
-        System.out.println("# Site,  delta lnL,  dof, LRT,       FDR");
+        System.out.println("LrtResults:\n#   Site,  delta lnL,  dof, LRT,       FDR");
         for (Result r : polymorphicSites) {
-            System.out.printf("- %4d, %s,  %s,   %.7f, %.7f%n",
+            System.out.printf("- [ %4d, %s,  %s,   %.7f, %.7f ]%n",
                     r.site,
                     Strings.padStart(df.format(r.models.get(1).lnL - r.models.get(0).lnL), 10, ' '),
                     r.models.get(1).parameters - r.models.get(0).parameters,
@@ -204,7 +218,7 @@ public class Analyse {
             System.out.println("ERROR: The tree and alignment do not have the same taxa.");
             System.exit(1);
         } else {
-            System.out.printf("Alignment:\n\tSequenceCount: %s\n\tSiteCount: %s\n\n", alignment.getSequenceCount(), alignment.getSiteCount());
+            System.out.printf("Alignment:\n  SequenceCount: %s\n  SiteCount: %s\n\n", alignment.getSequenceCount(), alignment.getSiteCount());
         }
 
         // 2. Check that all taxa have an assigned group and all groups are used
