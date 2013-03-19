@@ -1,5 +1,6 @@
 package tdg09.models;
 
+import com.google.common.collect.Maps;
 import pal.alignment.Alignment;
 import pal.tree.SimpleTree;
 import pal.tree.Tree;
@@ -26,6 +27,7 @@ public class PhyloAlignment {
     private int mostCommonRes;
     private boolean[] activeAminoAcids = new boolean[20];
     private int activeAminoAcidCount = 0;
+    private Map<Character, Integer> residues = Maps.newLinkedHashMap();
 
     public PhyloAlignment(Alignment alignment, Tree tree, int site, boolean deleteSingles) {
         this.tree = (SimpleTree) tree;
@@ -65,7 +67,7 @@ public class PhyloAlignment {
 
             for (String nodeName : seqData.keySet()) {
                 if (deleteThese.contains(seqData.get(nodeName))) {
-                    System.out.printf("Deleting single residue from %s (%s)\n", nodeName, molDataType.getChar(seqData.get(nodeName)));
+                    //System.out.printf("Deleting single residue from %s (%s)\n", nodeName, molDataType.getChar(seqData.get(nodeName)));
                     aaCount[seqData.get(nodeName)]--;
                     seqData.put(nodeName, 20);
                 }
@@ -73,7 +75,7 @@ public class PhyloAlignment {
         }
 
         // set (and output) the number of active amino acids in this alignment
-        System.out.printf("Residues: [");
+        //System.out.printf("Residues: [");
         for (int i = 0; i < 20; i++) {
             activeAminoAcids[i] = false;
             if ((aaCount[i] > 0) && (i != mostCommonRes)) {
@@ -81,15 +83,20 @@ public class PhyloAlignment {
                 activeAminoAcidCount++;
             }
             if (aaCount[i] > 0) {
-                System.out.printf("%s:%s, ", Constants.aaNames[i], aaCount[i]);
+                //System.out.printf("%s:%s, ", Constants.aaNames[i], aaCount[i]);
+                residues.put(Constants.aaNames[i], aaCount[i]);
             }
         }
 
-        System.out.println("]");
+        //System.out.println("]");
 
-        System.out.println("Most common residue is " + mostCommonRes + " " + Constants.aaNames[mostCommonRes]);
-        System.out.println("Active residues : " + activeAminoAcidCount);
+        //System.out.println("Most common residue is " + mostCommonRes + " " + Constants.aaNames[mostCommonRes]);
+        //System.out.println("Active residues : " + activeAminoAcidCount);
 
+    }
+
+    public Map<Character, Integer> getResidues() {
+        return residues;
     }
 
     public int getNumberOfActiveAminoAcids() {

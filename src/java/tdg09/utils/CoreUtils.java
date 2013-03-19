@@ -9,6 +9,8 @@ import pal.tree.Tree;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.lang.reflect.Field;
+import java.util.Comparator;
 import java.util.Set;
 
 /**
@@ -48,6 +50,30 @@ public class CoreUtils {
         }
 
         return !(seqs.size() != nodes.size() || Sets.symmetricDifference(seqs, nodes).size() > 0);
+    }
+
+    public static <T> Comparator<T> getDoubleComparator(final String name, final T clazz) {
+        return new Comparator<T>() {
+            public int compare(T o1, T o2) {
+                try {
+                    Field f = clazz.getClass().getField(name);
+
+                    double d1 = f.getDouble(o1);
+                    double d2 = f.getDouble(o2);
+
+                    if (d1 < d2) {
+                        return -1;
+                    } else if (d1 == d2) {
+                        return 0;
+                    } else {
+                        return 1;
+                    }
+
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
     }
 
 }

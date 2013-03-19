@@ -4,8 +4,9 @@ import com.beust.jcommander.JCommander;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.apache.commons.lang.ArrayUtils;
+import org.yaml.snakeyaml.Yaml;
 import pal.alignment.Alignment;
+import pal.statistics.LikelihoodRatioTest;
 import pal.tree.Node;
 import pal.tree.Tree;
 import pal.tree.TreeUtils;
@@ -16,9 +17,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.Timestamp;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -36,14 +35,21 @@ public class Analyse {
     }
 
     private void run(String[] args) {
-        // TODO: print output to console AND a file with the 'name' prefix, ala RAxML
+        // Parse the command-line options
+        JCommander jc = new JCommander(options);
+        try {
+            jc.parse(args);
+        } catch (Exception e) {
+            jc.setProgramName("java -cp tdg09.jar tdg09.Analyse");
+            jc.usage();
+            System.exit(1);
+        }
+
+        // TODO: print output to console and also a file with the 'name' prefix, ala RAxML
         System.out.printf("StartTime: %s\n", new Timestamp(System.currentTimeMillis()));
         System.out.printf("WorkingDirectory: %s\n", System.getProperty("user.dir"));
         System.out.printf("Options: %s\n\n", Joiner.on(" ").join(Lists.newArrayList(args)));
 
-        // Parse the command-line options
-        JCommander jc = new JCommander(options);
-        jc.parse(args);
 
         // Load the tree and alignment
         System.out.printf("TreeFile: %s\n", new File(options.treePath).getAbsolutePath());
@@ -82,14 +88,20 @@ public class Analyse {
 
         // We're now ready to run
         ExecutorService pool = Executors.newFixedThreadPool(options.threads);
-        List<Future<Void>> futures = Lists.newArrayList();
+        List<Future<Result>> futures = Lists.newArrayList();
 
         for (int i = 1; i <= alignment.getSiteCount(); i++) {
-            futures.add(pool.submit(new SiteAnalyser(alignment, tree, i)));
+        //for (int i = 1; i <= 10; i++) {
+            futures.add(pool.submit(new SiteAnalyser(alignment, tree, i, options.groups)));
         }
 
+        List<Result> results = Lists.newArrayList();
+
         try {
-            for (Future<Void> future : futures) future.get();
+            for (Future<Result> future : futures) {
+                results.add(future.get());
+                future.get().toYaml();
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -98,10 +110,68 @@ public class Analyse {
 
         pool.shutdown();
 
+        System.out.print("\n---\n\n");
+        doLRT(results);
 
+        System.out.print("\n---\n\n");
+        printSummary(results);
+
+        System.out.println();
+        System.out.printf("EndTime: %s\n", new Timestamp(System.currentTimeMillis()));
+
+        System.out.println("...");
     }
 
+    private void printSummary(List<Result> results) {
+        System.out.println("# Other information");
+        System.out.println();
 
+        List<Integer> sites = Lists.newArrayList();
+        for (Result r : results) if (r.models == null) sites.add(r.site);
+        System.out.println("ConservedPositions:");
+        System.out.printf ("    Count: %s\n", sites.size());
+        System.out.printf ("    Sites: %s\n", new Yaml().dump(sites));
+    }
+
+    private void doLRT(List<Result> results) {
+        System.out.println("# Likelihood ratio test:");
+        System.out.println();
+
+        List<Result> polymorphicSites = Lists.newArrayList();
+
+        for (Result r : results) {
+            if (r.models != null) {
+                polymorphicSites.add(r);
+
+                r.lrt = LikelihoodRatioTest.getSignificance(
+                        r.models.get(1).lnL - r.models.get(0).lnL, // delta lnL
+                        r.models.get(1).parameters - r.models.get(0).parameters); // degrees of freedom
+            }
+        }
+
+        // order by likelihood ratio test p-value
+        Collections.sort(polymorphicSites, CoreUtils.getDoubleComparator("lrt", results.get(0)));
+
+        // calculate false discovery rate (naive method)
+        for (int i = 0; i < polymorphicSites.size(); i++) {
+            int rank = i + 1;
+            Result r = polymorphicSites.get(i);
+            r.fdr = r.lrt * polymorphicSites.size() / rank;
+        }
+
+        // order by false discovery rate
+        Collections.sort(polymorphicSites, CoreUtils.getDoubleComparator("fdr", results.get(0)));
+
+        System.out.println("# Site, delta lnL,  dof, P-value,   FDR");
+        for (Result r : polymorphicSites) {
+            System.out.printf("- %1$4d, %2$3.7f,  %3$s,   %4$.7f, %5$.7f%n",
+                    r.site,
+                    r.models.get(1).lnL - r.models.get(0).lnL,
+                    r.models.get(1).parameters - r.models.get(0).parameters,
+                    r.lrt,
+                    r.fdr);
+        }
+    }
 
     private void validate(Tree tree, Alignment alignment) {
         // 1. Check the tree and alignment are in agreement
@@ -143,7 +213,7 @@ public class Analyse {
             }
         }
 
-        System.out.printf("Groups: %s\n\n", Joiner.on(", ").join(options.groups));
+        System.out.printf("Groups: [%s]\n\n", Joiner.on(", ").join(options.groups));
 
     }
 
