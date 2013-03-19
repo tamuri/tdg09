@@ -84,7 +84,7 @@ public class Analyse {
 
         StringWriter sw = new StringWriter();
         TreeUtils.printNH(tree, new PrintWriter(sw));
-        System.out.printf("LabelledTree: %s\n", sw.toString().replaceAll("\n", ""));
+        System.out.printf("LabelledTree: >\n\t%s\n", sw.toString().replaceAll("\n", "\n\t"));
         System.out.println();
 
         // We're now ready to run
