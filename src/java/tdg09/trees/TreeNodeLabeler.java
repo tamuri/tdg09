@@ -16,22 +16,16 @@ import java.util.*;
  * doi:10.1371/journal.pcbi.1000564
  */
 public class TreeNodeLabeler {
-    public static void main(String[] args) {
-        TreeNodeLabeler m = new TreeNodeLabeler();
+    public static void main(String[] args) throws Exception {
+        TreeNodeLabeler tnl = new TreeNodeLabeler();
 
         Tree t = Utils.readTree(args[0]);
-        Tree out = m.label(t);
+        Tree out = tnl.label(t);
 
-        FileWriter fw;
-        try {
-            fw = new FileWriter(args[0] + ".out");
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            throw new RuntimeException();
-        }
-
+        FileWriter fw  = new FileWriter(args[0] + ".out");
         PrintWriter pw = new PrintWriter(fw);
         TreeUtils.printNH(out, pw);
+        fw.close();
         pw.close();
     }
 

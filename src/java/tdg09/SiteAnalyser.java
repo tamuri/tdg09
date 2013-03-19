@@ -30,11 +30,9 @@ public class SiteAnalyser implements Callable<Result> {
 
     public Result call() throws Exception {
 
-        // System.out.printf("Site: %s\n", site);
         PhyloAlignment phyloAlignment = new PhyloAlignment(alignment, tree, site, Constants.DELETE_SINGLES);
 
         if (phyloAlignment.getNumberOfActiveAminoAcids() == 0) {
-            // System.out.println("No active residues");
             return new Result(site, phyloAlignment.getResidues(), null);
         }
 
@@ -45,39 +43,26 @@ public class SiteAnalyser implements Callable<Result> {
 
         // HOMOGENEOUS (model B)
         LikelihoodCalculator modelWAGssF = new LikelihoodCalculator(phyloAlignment);
-        // Rate nuB = new Rate(nuA.getValue(), true);
         Rate nuB = new Rate(Constants.DEFAULT_ETA, true);
         Frequencies piB = new Frequencies(phyloAlignment.getEquilibriumFrequencies(), true);
         modelWAGssF.setParameters(nuB, piB);
         modelWAGssF.setDefaultModel(new CladeModel(nuB, piB, true));
         runMinimisation(modelWAGssF, min);
-
-        // printResult("WAG+ssF", min.getParamValues().length, -min.getMinimum(), nuB, piB);
         models.add(getModel("WAG+ssF", min.getConvStatus(), min.getParamValues().length, -min.getMinimum(), Lists.newArrayList(nuB, piB)));
 
         // HOST-SPECIFIC FREQUENCIES, SHARED RATE SCALING FACTOR (model C)
         LikelihoodCalculator modelWAGlssF = new LikelihoodCalculator(phyloAlignment);
         Rate nuC = new Rate(nuB.getValue(), true);
-
         List<Parameter> groupParameters = Lists.newArrayList();
         groupParameters.add(nuC);
-
         for (String group : groups) {
             Frequencies f = new Frequencies(piB.getValue(), true);
             groupParameters.add(f);
             modelWAGlssF.addCladeModel(group, new CladeModel(nuC, f, true));
         }
-
-        // Frequencies piC1 = new Frequencies(piB.getValue(), true);
-        // Frequencies piC2 = new Frequencies(piB.getValue(), true);
-        // modelWAGlssF.addCladeModel("Av", new CladeModel(nuC, piC1, true));
-        // modelWAGlssF.addCladeModel("Hu", new CladeModel(nuC, piC2, true));
         modelWAGlssF.setParameters(groupParameters.toArray(new Parameter[groupParameters.size()]));
-
         runMinimisation(modelWAGlssF, min);
-        // printResult("WAG+lssF", min.getParamValues().length, -min.getMinimum(), nuC, piC1, piC2);
         models.add(getModel("WAG+lssF", min.getConvStatus(), min.getParamValues().length, -min.getMinimum(), groupParameters));
-        // System.out.printf("\nAR\t%s\n", ArrayUtils.toString(modelWAGlssF.getAncestralRecon()));
 
         return new Result(site, phyloAlignment.getResidues(), models);
     }
@@ -112,7 +97,6 @@ public class SiteAnalyser implements Callable<Result> {
         min.nelderMead(model, pfm.getParameters(), pfm.getStepSize(), Constants.DEFAULT_TOL);
         model.updateParameters(min.getParamValues());
     }
-
 
     private void addConstraints(Minimisation min, ParametersForMinimisation pfm) {
         min.removeConstraints();

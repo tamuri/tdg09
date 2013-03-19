@@ -1,5 +1,6 @@
 package tdg09.models;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import pal.alignment.Alignment;
 import pal.tree.SimpleTree;
@@ -58,7 +59,7 @@ public class PhyloAlignment {
         }
 
         if (deleteSingles) {
-            Vector<Integer> deleteThese = new Vector<Integer>();
+            List<Integer> deleteThese = Lists.newArrayList();
             for (int i = 0; i < 20; i++) {
                 if (aaCount[i] == 1) {
                     deleteThese.add(i);
@@ -67,15 +68,12 @@ public class PhyloAlignment {
 
             for (String nodeName : seqData.keySet()) {
                 if (deleteThese.contains(seqData.get(nodeName))) {
-                    //System.out.printf("Deleting single residue from %s (%s)\n", nodeName, molDataType.getChar(seqData.get(nodeName)));
                     aaCount[seqData.get(nodeName)]--;
                     seqData.put(nodeName, 20);
                 }
             }
         }
 
-        // set (and output) the number of active amino acids in this alignment
-        //System.out.printf("Residues: [");
         for (int i = 0; i < 20; i++) {
             activeAminoAcids[i] = false;
             if ((aaCount[i] > 0) && (i != mostCommonRes)) {
@@ -83,15 +81,10 @@ public class PhyloAlignment {
                 activeAminoAcidCount++;
             }
             if (aaCount[i] > 0) {
-                //System.out.printf("%s:%s, ", Constants.aaNames[i], aaCount[i]);
                 residues.put(Constants.aaNames[i], aaCount[i]);
             }
         }
 
-        //System.out.println("]");
-
-        //System.out.println("Most common residue is " + mostCommonRes + " " + Constants.aaNames[mostCommonRes]);
-        //System.out.println("Active residues : " + activeAminoAcidCount);
 
     }
 

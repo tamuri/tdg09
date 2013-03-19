@@ -85,7 +85,7 @@ public class Analyse {
         StringWriter sw = new StringWriter();
         TreeUtils.printNH(tree, new PrintWriter(sw));
         System.out.printf("LabelledTree: >\n\t%s\n", sw.toString().replaceAll("\n", "\n\t"));
-        System.out.println();
+        System.out.print("\n---\n\n");
 
         // We're now ready to run
         ExecutorService pool = Executors.newFixedThreadPool(options.threads);
@@ -122,17 +122,6 @@ public class Analyse {
     }
 
     private void fullResults(List<Result> results) {
-        System.out.println("# Complete");
-        System.out.println();
-
-        List<Integer> sites = Lists.newArrayList();
-        for (Result r : results) if (r.models == null) sites.add(r.site);
-        System.out.println("ConservedPositions:");
-        System.out.printf ("    Count: %s\n", sites.size());
-        System.out.printf ("    Sites: %s\n", new Yaml().dump(sites));
-
-        System.out.println();
-
         System.out.println("# Ordered by site");
         Collections.sort(results, Utils.doubleComparator("site", Result.class));
         DecimalFormat df = new DecimalFormat("###0.000000");
@@ -154,6 +143,17 @@ public class Analyse {
                 System.out.printf("- %4d%n", r.site);
             }
         }
+
+        System.out.print("\n---\n\n");
+
+        System.out.println("# Misc.");
+        System.out.println();
+        List<Integer> sites = Lists.newArrayList();
+        for (Result r : results) if (r.models == null) sites.add(r.site);
+        System.out.println("ConservedPositions:");
+        System.out.printf ("    Count: %s\n", sites.size());
+        System.out.printf ("    Sites: %s\n", new Yaml().dump(sites));
+
     }
 
     private void doLRT(List<Result> results) {
@@ -187,7 +187,7 @@ public class Analyse {
 
         DecimalFormat df = new DecimalFormat("##0.000000");
 
-        System.out.println("# Site,  delta lnL,  dof, P-value,   FDR");
+        System.out.println("# Site,  delta lnL,  dof, LRT,       FDR");
         for (Result r : polymorphicSites) {
             System.out.printf("- %4d, %s,  %s,   %.7f, %.7f%n",
                     r.site,
