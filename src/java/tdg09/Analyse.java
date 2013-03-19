@@ -98,7 +98,7 @@ public class Analyse {
         ExecutorService pool = Executors.newFixedThreadPool(options.threads);
         CompletionService<Result> ecs = new ExecutorCompletionService<Result>(pool);
 
-       for (int i = 1; i <= 10; i++) {
+       for (int i = 1; i <= alignment.getSiteCount(); i++) {
             ecs.submit(new SiteAnalyser(alignment, tree, i, options.groups));
         }
 
@@ -109,7 +109,7 @@ public class Analyse {
             while (!pool.isTerminated()) {
                 Result r = ecs.take().get();
                 results.add(r);
-                System.out.printf("# site %s complete", r.site);
+                System.out.printf("# %s - site %s complete.", new Timestamp(System.currentTimeMillis()), r.site);
                 if (r.models != null) if (!r.models.get(0).converged || !r.models.get(1).converged)
                     System.out.print(" (warning: did not converge)");
                 System.out.println();
