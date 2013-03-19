@@ -11,7 +11,6 @@ import pal.tree.Node;
 import pal.tree.Tree;
 import pal.tree.TreeUtils;
 import tdg09.trees.TreeNodeLabeler;
-import tdg09.utils.CoreUtils;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -53,10 +52,10 @@ public class Analyse {
 
         // Load the tree and alignment
         System.out.printf("TreeFile: %s\n", new File(options.treePath).getAbsolutePath());
-        Tree tree = CoreUtils.readTree(options.treePath);
+        Tree tree = Utils.readTree(options.treePath);
 
         System.out.printf("AlignmentFile: %s\n\n", new File(options.alignmentPath).getAbsolutePath());
-        Alignment alignment = CoreUtils.readAlignment(options.alignmentPath);
+        Alignment alignment = Utils.readAlignment(options.alignmentPath);
 
 
         validate(tree, alignment);
@@ -150,7 +149,7 @@ public class Analyse {
         }
 
         // order by likelihood ratio test p-value
-        Collections.sort(polymorphicSites, CoreUtils.getDoubleComparator("lrt", results.get(0)));
+        Collections.sort(polymorphicSites, Utils.getDoubleComparator("lrt", results.get(0)));
 
         // calculate false discovery rate (naive method)
         for (int i = 0; i < polymorphicSites.size(); i++) {
@@ -160,7 +159,7 @@ public class Analyse {
         }
 
         // order by false discovery rate
-        Collections.sort(polymorphicSites, CoreUtils.getDoubleComparator("fdr", results.get(0)));
+        Collections.sort(polymorphicSites, Utils.getDoubleComparator("fdr", results.get(0)));
 
         System.out.println("# Site, delta lnL,  dof, P-value,   FDR");
         for (Result r : polymorphicSites) {
@@ -175,7 +174,7 @@ public class Analyse {
 
     private void validate(Tree tree, Alignment alignment) {
         // 1. Check the tree and alignment are in agreement
-        if (!CoreUtils.isTreeAndAlignmentValid(tree, alignment)) {
+        if (!Utils.isTreeAndAlignmentValid(tree, alignment)) {
             System.out.println("ERROR: The tree and alignment do not have the same taxa.");
             System.exit(1);
         } else {

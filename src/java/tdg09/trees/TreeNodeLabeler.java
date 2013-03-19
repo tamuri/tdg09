@@ -1,7 +1,7 @@
 package tdg09.trees;
 
 import pal.tree.*;
-import tdg09.utils.CoreUtils;
+import tdg09.Utils;
 
 import java.io.*;
 import java.util.*;
@@ -19,7 +19,7 @@ public class TreeNodeLabeler {
     public static void main(String[] args) {
         TreeNodeLabeler m = new TreeNodeLabeler();
 
-        Tree t = CoreUtils.readTree(args[0]);
+        Tree t = Utils.readTree(args[0]);
         Tree out = m.label(t);
 
         FileWriter fw;

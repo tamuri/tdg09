@@ -1,4 +1,4 @@
-package tdg09.utils;
+package tdg09;
 
 import com.google.common.collect.Sets;
 import pal.alignment.Alignment;
@@ -17,7 +17,7 @@ import java.util.Set;
  * Author: Asif Tamuri (atamuri@ebi.ac.uk)
  * Date: 18/03/2013 16:48
  */
-public class CoreUtils {
+public class Utils {
     public static Tree readTree(String filePath) {
         Tree tree;
         try {
