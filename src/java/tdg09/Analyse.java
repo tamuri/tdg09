@@ -7,6 +7,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.introspector.BeanAccess;
+import org.yaml.snakeyaml.introspector.Property;
+import org.yaml.snakeyaml.introspector.PropertyUtils;
+import org.yaml.snakeyaml.representer.Representer;
 import pal.alignment.Alignment;
 import pal.statistics.LikelihoodRatioTest;
 import pal.tree.Node;
@@ -14,6 +18,7 @@ import pal.tree.Tree;
 import pal.tree.TreeUtils;
 import tdg09.trees.TreeNodeLabeler;
 
+import java.beans.IntrospectionException;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -128,7 +133,9 @@ public class Analyse {
 
         Map<String, List<Result>> m = Maps.newHashMap();
         m.put("SiteResults", results);
-        Yaml yaml = new Yaml();
+
+
+        Yaml yaml = new Yaml(Result.getYamlRepresenter());
         System.out.println(yaml.dump(m));
 
 
@@ -156,7 +163,7 @@ public class Analyse {
                         r.lrt,
                         r.fdr);
             } else {
-                System.out.printf("- [ %4d, NA,          NA, NA,          NA,         NA, NA,        NA,        NA ]%n", r.site);
+                System.out.printf("- [ %4d,  NA,         NA, NA,          NA,         NA, NA,        NA,        NA ]%n", r.site);
             }
         }
 
