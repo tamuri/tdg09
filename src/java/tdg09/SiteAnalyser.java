@@ -3,7 +3,6 @@ package tdg09;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import flanagan.math.Minimisation;
-import org.apache.commons.lang.ArrayUtils;
 import pal.alignment.Alignment;
 import pal.tree.Tree;
 import tdg09.models.*;
@@ -39,7 +38,7 @@ public class SiteAnalyser implements Callable<Result> {
             return new Result(site, phyloAlignment.getResidues(), null);
         }
 
-        List<Model> models = Lists.newArrayList();
+        List<Result.Model> models = Lists.newArrayList();
 
         Minimisation min = new Minimisation();
         min.suppressNoConvergenceMessage();
@@ -83,7 +82,7 @@ public class SiteAnalyser implements Callable<Result> {
         return new Result(site, phyloAlignment.getResidues(), models);
     }
 
-    private Model getModel(String name, boolean converged, int n, double logLikelihood, List<Parameter> params) {
+    private Result.Model getModel(String name, boolean converged, int n, double logLikelihood, List<Parameter> params) {
 
         double rate = Double.NaN;
         List<Map<Character, Double>> frequencies = Lists.newArrayList();
@@ -104,7 +103,7 @@ public class SiteAnalyser implements Callable<Result> {
         }
 
 
-        return new Model(name, n, rate, logLikelihood, frequencies, converged);
+        return new Result.Model(name, n, rate, logLikelihood, frequencies, converged);
     }
 
     private void runMinimisation(LikelihoodCalculator model, Minimisation min) {
