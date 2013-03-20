@@ -7,25 +7,23 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.introspector.BeanAccess;
-import org.yaml.snakeyaml.introspector.Property;
-import org.yaml.snakeyaml.introspector.PropertyUtils;
-import org.yaml.snakeyaml.representer.Representer;
 import pal.alignment.Alignment;
 import pal.statistics.LikelihoodRatioTest;
 import pal.tree.Node;
 import pal.tree.Tree;
 import pal.tree.TreeUtils;
-import tdg09.trees.TreeNodeLabeler;
+import tdg09.trees.TreeNodeLabeller;
 
-import java.beans.IntrospectionException;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * The main entry point for tdg09 analysis.
@@ -80,8 +78,8 @@ public class Analyse {
 
         if (!labelled) {
             System.out.println("# The internal nodes of the tree are not labelled. Labelling...");
-            TreeNodeLabeler labeler = new TreeNodeLabeler();
-            tree = labeler.label(tree);
+            TreeNodeLabeller labeller = new TreeNodeLabeller();
+            tree = labeller.label(tree);
         }
 
         // Output the labelling of internal nodes
@@ -110,7 +108,7 @@ public class Analyse {
                 Result r = ecs.take().get();
                 results.add(r);
                 System.out.printf("# %s - site %s complete.", new Timestamp(System.currentTimeMillis()), r.site);
-                if (r.models != null) if (!r.models.get(0).converged || !r.models.get(1).converged)
+                if (r.models != null && (!r.models.get(0).converged || !r.models.get(1).converged))
                     System.out.print(" (warning: did not converge)");
                 System.out.println();
             }
@@ -178,11 +176,11 @@ public class Analyse {
     }
 
     private void doLRT(List<Result> results) {
-        List<Result> polymorphicSites = Lists.newArrayList();
+        List<Result> polySites = Lists.newArrayList();
 
         for (Result r : results) {
             if (r.models != null) {
-                polymorphicSites.add(r);
+                polySites.add(r);
 
                 r.lrt = LikelihoodRatioTest.getSignificance(
                         r.models.get(1).lnL - r.models.get(0).lnL, // delta lnL
@@ -194,22 +192,22 @@ public class Analyse {
         }
 
         // order by likelihood ratio test p-value
-        Collections.sort(polymorphicSites, Utils.doubleComparator("lrt", Result.class));
+        Collections.sort(polySites, Utils.doubleComparator("lrt", Result.class));
 
         // calculate false discovery rate (naive method)
-        for (int i = 0; i < polymorphicSites.size(); i++) {
+        for (int i = 0; i < polySites.size(); i++) {
             int rank = i + 1;
-            Result r = polymorphicSites.get(i);
-            r.fdr = r.lrt * polymorphicSites.size() / rank;
+            Result r = polySites.get(i);
+            r.fdr = r.lrt * polySites.size() / rank;
         }
 
         // order by false discovery rate
-        Collections.sort(polymorphicSites, Utils.doubleComparator("fdr", Result.class));
+        Collections.sort(polySites, Utils.doubleComparator("fdr", Result.class));
 
         DecimalFormat df = new DecimalFormat("##0.000000");
 
         System.out.println("LrtResults:\n#   Site,  delta lnL,  dof, LRT,       FDR");
-        for (Result r : polymorphicSites) {
+        for (Result r : polySites) {
             System.out.printf("- [ %4d, %s,  %s,   %.7f, %.7f ]%n",
                     r.site,
                     Strings.padStart(df.format(r.models.get(1).lnL - r.models.get(0).lnL), 10, ' '),

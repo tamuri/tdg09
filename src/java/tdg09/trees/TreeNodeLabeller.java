@@ -15,9 +15,9 @@ import java.util.*;
  * PLoS Comput Biol 5(11): e1000564.
  * doi:10.1371/journal.pcbi.1000564
  */
-public class TreeNodeLabeler {
+public class TreeNodeLabeller {
     public static void main(String[] args) throws Exception {
-        TreeNodeLabeler tnl = new TreeNodeLabeler();
+        TreeNodeLabeller tnl = new TreeNodeLabeller();
 
         Tree t = Utils.readTree(args[0]);
         Tree out = tnl.label(t);
