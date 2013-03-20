@@ -6,6 +6,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.primitives.Chars;
 import org.yaml.snakeyaml.Yaml;
 import pal.alignment.Alignment;
 import pal.statistics.LikelihoodRatioTest;
@@ -187,7 +188,7 @@ public class Analyse {
 
         System.out.println();
         System.out.println("HomogeneousFrequencies:");
-        System.out.println("# Site, A, R, N, D, C, Q, E, G, H, I, L, K, M, F, P, S, T, W ,Y, V");
+        System.out.printf("# Site, %s%n", Chars.join(", ", Constants.aaNames));
         for (Result r : results) {
             if (r.models != null) {
                 List<Double> f = r.models.get(0).getFlatFrequencies().get(0);
@@ -204,7 +205,7 @@ public class Analyse {
             String group = options.groups.get(i);
             System.out.println();
             System.out.printf("NonHomogeneousFrequencies_%s:\n", group);
-            System.out.println("# Site, A, R, N, D, C, Q, E, G, H, I, L, K, M, F, P, S, T, W ,Y, V");
+            System.out.printf("# Site, %s%n", Chars.join(", ", Constants.aaNames));
             for (Result r : results) {
                 if (r.models != null) {
                     List<Double> f = r.models.get(1).getFlatFrequencies().get(i);
