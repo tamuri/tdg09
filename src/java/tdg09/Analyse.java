@@ -12,6 +12,7 @@ import pal.statistics.LikelihoodRatioTest;
 import pal.tree.Node;
 import pal.tree.Tree;
 import pal.tree.TreeUtils;
+import tdg09.models.Constants;
 import tdg09.trees.TreeNodeLabeller;
 
 import java.io.File;
@@ -183,6 +184,35 @@ public class Analyse {
         System.out.println("ConservedPositions:");
         System.out.printf ("    Count: %s\n", sites.size());
         System.out.printf ("    Sites: %s\n", new Yaml().dump(sites));
+
+        System.out.println();
+        System.out.println("HomogeneousFrequencies:");
+        System.out.println("# Site, A, R, N, D, C, Q, E, G, H, I, L, K, M, F, P, S, T, W ,Y, V");
+        for (Result r : results) {
+            if (r.models != null) {
+                List<Double> f = r.models.get(0).getFlatFrequencies().get(0);
+                System.out.printf("- [ %s, %s ]\n", r.site, Joiner.on(", ").join(f));
+            }
+        }
+
+        System.out.println();
+        List<Double> rates = Lists.newArrayList();
+        for (Result r : results) if (r.models != null) rates.add(r.models.get(0).rate);
+        System.out.printf("HomogeneousRates: %s%n", new Yaml().dump(rates));
+
+        for (int i = 0; i < options.groups.size(); i++) {
+            String group = options.groups.get(i);
+            System.out.println();
+            System.out.printf("NonHomogeneousFrequencies_%s:\n", group);
+            System.out.println("# Site, A, R, N, D, C, Q, E, G, H, I, L, K, M, F, P, S, T, W ,Y, V");
+            for (Result r : results) {
+                if (r.models != null) {
+                    List<Double> f = r.models.get(1).getFlatFrequencies().get(i);
+                    System.out.printf("- [ %s, %s ]\n", r.site, Joiner.on(", ").join(f));
+                }
+            }
+        }
+
 
     }
 

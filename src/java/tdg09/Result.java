@@ -1,9 +1,11 @@
 package tdg09;
 
+import com.google.common.collect.Lists;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.introspector.PropertyUtils;
 import org.yaml.snakeyaml.representer.Representer;
+import tdg09.models.Constants;
 
 import java.beans.IntrospectionException;
 import java.util.LinkedHashSet;
@@ -45,6 +47,24 @@ public class Result {
             this.lnL = lnL;
             this.frequencies = frequencies;
             this.converged = converged;
+        }
+
+        public List<List<Double>> getFlatFrequencies() {
+            List<List<Double>> f = Lists.newArrayList();
+
+            for (Map<Character, Double> mf : this.frequencies) {
+                List<Double> d = Lists.newArrayList();
+                for (int i = 0; i < Constants.aaNames.length; i++) {
+                    if (mf.containsKey(Constants.aaNames[i])) {
+                        d.add(mf.get(Constants.aaNames[i]));
+                    } else {
+                        d.add(0.0);
+                    }
+                }
+                f.add(d);
+            }
+
+            return f;
         }
     }
 

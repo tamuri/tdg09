@@ -223,3 +223,4 @@ The output contains a "LabelledTree" that shows the inferred lineage for each an
 	
 	![image](./example_plot.png)
 
+    The R code in `src/R/example.R` also provides an example of using the [phangorn](http://cran.r-project.org/web/packages/phangorn/index.html) and [ape](http://cran.r-project.org/web/packages/ape/) packages to simulate data under the homogeneous model for a particular site. We can then analyse the synthetic data with the TdG09 software, the parametric bootstrap providing significance of the non-homogeneous model on the original data.

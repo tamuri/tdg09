@@ -46,4 +46,27 @@ for (p in 1:5) {
     points(which(fdr <= 0.05), 1 - fdr[fdr <= 0.05], pch=20, col="#DE2D26")
 }
 
+# We can use the phangorn and ape packages to generate simulated sequences
+library(phangorn)
+library(ape)
 
+simtree <- read.tree(text = out$LabelledTree)    # Load the tree
+
+# Get the site amino acid equilibrium frequencies for the homogeneous model
+homog_f <- as.data.frame(matrix(unlist(out$HomogeneousFrequencies), ncol=21, byrow=T))
+names(homog_f) <- c("Site", strsplit("ARNDCQEGHILKMFPSTWYV", split="")[[1]])
+
+# Get the amino acid frequencies for a particular site (say, 204)
+site_pos <- which(homog_f$Site == 204)
+freqs <- as.numeric(homog_f[site_pos, 2:21])     # Site 204 is row 98
+freqs[freqs == 0] <- 0.000000000001       # Add pseudocounts for unobserved amino acids
+freqs <- freqs / sum(freqs)               # Normalise
+
+# Synthesize 1000 sites using the WAG+ssF (site-specific frequencies/homogeneous) model
+sim_seqs <- simSeq(tree, l=1000, bf=freqs, type="AA", model="WAG", rate=out$HomogeneousRates[site_pos])
+
+# Save the sequence (there is probably a much easier way than this)
+write.dna(file='~/sim_site204.txt', x=toupper(as.character(sim_seqs)), format='sequential', nbcol= -1, colsep='')
+
+# We can analyse the simulated data (1000 sites simulated under site 204's homogeneous model)
+# and use the Cox test to calculate statistical significance of the non-homogeneous model for the real data.
