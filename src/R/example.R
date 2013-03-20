@@ -1,6 +1,6 @@
 # An example of how to load output from tdg09 program in R and inspect the results
-# Author: Asif Tamuri
-# Date: 2013-03-20
+# @author Asif Tamuri
+# @version 1.1
 
 # Install the R package 'yaml' to parse the tdg09 output file
 install.packages("yaml")

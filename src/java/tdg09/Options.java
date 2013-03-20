@@ -5,10 +5,9 @@ import com.beust.jcommander.Parameter;
 import java.util.List;
 
 /**
- * Command-line options
- *
- * User: atamuri
- * Date: 18/03/2013 16:32
+ * A container for command-line options, used by JCommander.
+ * @author Asif Tamuri
+ * @version 1.1
  */
 public class Options {
     @Parameter(required = true, names = "-alignment", description = "Alignment in PHYLIP format")

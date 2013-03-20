@@ -26,10 +26,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * The main entry point for tdg09 analysis.
+ * The main class for running TdG09 analysis.
  *
- * Author: Asif Tamuri (atamuri@ebi.ac.uk)
- * Date: 18/03/2013 16:31
+ * Tamuri AU, dos Reis M, Hay AJ, Goldstein RA (2009)
+ * Identifying Changes in Selective Constraints: Host Shifts in Influenza.
+ * PLoS Comput Biol 5(11): e1000564.
+ * doi:10.1371/journal.pcbi.1000564
+ *
+ * @author Asif Tamuri
+ * @version 1.1
  */
 public class Analyse {
     Options options = new Options();

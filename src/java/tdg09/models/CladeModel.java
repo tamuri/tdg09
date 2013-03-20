@@ -4,13 +4,11 @@ import pal.substmodel.RateMatrix;
 import pal.substmodel.WAG;
 
 /**
- * @author Asif Tamuri <atamuri@nimr.mrc.ac.uk>
- * @version 1.0
+ * This class wraps a substitution model with rate and frequency parameters to define a single substitution model. The
+ * likelihood calculator will use one or more of these for branches in the tree.
  *
- * Tamuri AU, dos Reis M, Hay AJ, Goldstein RA (2009)
- * Identifying Changes in Selective Constraints: Host Shifts in Influenza.
- * PLoS Comput Biol 5(11): e1000564.
- * doi:10.1371/journal.pcbi.1000564
+ * @author Asif Tamuri
+ * @version 1.1
  */
 public class CladeModel {
     private Rate rate;

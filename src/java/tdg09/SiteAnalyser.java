@@ -12,9 +12,12 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
-* Author: Asif Tamuri (atamuri@ebi.ac.uk)
-* Date: 18/03/2013 21:54
-*/
+ * Given an alignment, tree and location, runs the homogeneous and non-homogeneous models. Is Callable and run in an
+ * ExecutionService by the Analyse class.
+ *
+ * @author Asif Tamuri
+ * @version 1.1
+ */
 public class SiteAnalyser implements Callable<Result> {
     final Alignment alignment;
     final Tree tree;

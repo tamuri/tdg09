@@ -1,14 +1,11 @@
 package tdg09.models;
 
 /**
- * @author Asif Tamuri <atamuri@nimr.mrc.ac.uk>
- * @author Richard Goldstein <rgoldst@nimr.mrc.ac.uk>
- * @version 1.0
+ * Program defaults
  *
- * Tamuri AU, dos Reis M, Hay AJ, Goldstein RA (2009)
- * Identifying Changes in Selective Constraints: Host Shifts in Influenza.
- * PLoS Comput Biol 5(11): e1000564.
- * doi:10.1371/journal.pcbi.1000564
+ * @author Asif Tamuri
+ * @author Richard Goldstein
+ * @version 1.1
  */
 
 public interface Constants {

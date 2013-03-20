@@ -12,8 +12,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Author: Asif Tamuri (atamuri@ebi.ac.uk)
- * Date: 19/03/2013 09:43
+ * Holds all the relevant results from the analysis of a site
+ *
+ * @author Asif Tamuri
+ * @version 1.1
  */
 public class Result {
     public final int site;

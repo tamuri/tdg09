@@ -7,13 +7,10 @@ import pal.tree.Tree;
 import tdg09.Utils;
 
 /**
- * @author Asif Tamuri <atamuri@nimr.mrc.ac.uk>
- * @version 1.0
+ * Original main class for analysis of flu viral proteins. Used in the paper.
  *
- * Tamuri AU, dos Reis M, Hay AJ, Goldstein RA (2009)
- * Identifying Changes in Selective Constraints: Host Shifts in Influenza.
- * PLoS Comput Biol 5(11): e1000564.
- * doi:10.1371/journal.pcbi.1000564
+ * @author Asif Tamuri
+ * @version 1.1
  */
 public class MainAvHu09 {
 

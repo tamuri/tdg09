@@ -14,8 +14,10 @@ import java.util.Comparator;
 import java.util.Set;
 
 /**
- * Author: Asif Tamuri (atamuri@ebi.ac.uk)
- * Date: 18/03/2013 16:48
+ * Miscellaneous useful utility functions.
+ *
+ * @author Asif Tamuri
+ * @version 1.1
  */
 public class Utils {
     public static Tree readTree(String filePath) {

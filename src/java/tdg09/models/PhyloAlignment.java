@@ -3,22 +3,21 @@ package tdg09.models;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import pal.alignment.Alignment;
+import pal.datatype.DataTypeTool;
+import pal.datatype.MolecularDataType;
 import pal.tree.SimpleTree;
 import pal.tree.Tree;
-import pal.datatype.MolecularDataType;
-import pal.datatype.DataTypeTool;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * @author Asif Tamuri <atamuri@nimr.mrc.ac.uk>
- * @author Richard Goldstein <rgoldst@nimr.mrc.ac.uk>
- * @version 1.0
+ * Prepares the site pattern for analysis by the LikelihoodCalculator
  *
- * Tamuri AU, dos Reis M, Hay AJ, Goldstein RA (2009)
- * Identifying Changes in Selective Constraints: Host Shifts in Influenza.
- * PLoS Comput Biol 5(11): e1000564.
- * doi:10.1371/journal.pcbi.1000564
+ * @author Asif Tamuri
+ * @author Richard Goldstein
+ * @version 1.1
  */
 public class PhyloAlignment {
 

@@ -1,19 +1,24 @@
 package tdg09.trees;
 
-import pal.tree.*;
+import pal.tree.Node;
+import pal.tree.SimpleTree;
+import pal.tree.Tree;
+import pal.tree.TreeUtils;
 import tdg09.Utils;
 
-import java.io.*;
-import java.util.*;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
- * @author Asif Tamuri <atamuri@nimr.mrc.ac.uk>
- * @version 1.0
+ * Takes a tree where taxa have been prefixed by a two-letter partition/group identifier and traverses the tree to
+ * label all internal nodes with the appropriate partition identifier. Can be called from the command-line.
  *
- * Tamuri AU, dos Reis M, Hay AJ, Goldstein RA (2009)
- * Identifying Changes in Selective Constraints: Host Shifts in Influenza.
- * PLoS Comput Biol 5(11): e1000564.
- * doi:10.1371/journal.pcbi.1000564
+ * @author Asif Tamuri
+ * @version 1.1
  */
 public class TreeNodeLabeller {
     public static void main(String[] args) throws Exception {
@@ -103,9 +108,4 @@ public class TreeNodeLabeller {
 
     }
 
-    private void printStringSet(Set<String> set) {
-        for (String s : set) {
-            System.out.printf("[%s] ", s);
-        }
-    }
 }

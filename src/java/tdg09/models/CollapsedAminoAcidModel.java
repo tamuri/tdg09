@@ -6,13 +6,10 @@ import pal.substmodel.RateMatrix;
 import java.io.PrintWriter;
 
 /**
- * @author Asif Tamuri <atamuri@nimr.mrc.ac.uk>
- * @version 1.0
+ * Based on PAL's WAG rate matrix, with our specified frequencies.
  *
- * Tamuri AU, dos Reis M, Hay AJ, Goldstein RA (2009)
- * Identifying Changes in Selective Constraints: Host Shifts in Influenza.
- * PLoS Comput Biol 5(11): e1000564.
- * doi:10.1371/journal.pcbi.1000564
+ * @author Asif Tamuri
+ * @version 1.1
  */
 public class CollapsedAminoAcidModel extends AbstractRateMatrix implements RateMatrix {
     private int[] aminoAcidList;

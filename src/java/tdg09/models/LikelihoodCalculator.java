@@ -1,21 +1,16 @@
 package tdg09.models;
 
+import flanagan.math.MinimisationFunction;
 import org.apache.commons.lang.ArrayUtils;
+import pal.tree.Node;
 
 import java.util.*;
 
-import flanagan.math.MinimisationFunction;
-import pal.tree.Node;
-
 /**
- * @author Asif Tamuri <atamuri@nimr.mrc.ac.uk>
- * @author Richard Goldstein <rgoldst@nimr.mrc.ac.uk>
- * @version 1.0
+ * Traverses the tree and calculates the log-likelihood at a given site using one or more CladeModels
  *
- * Tamuri AU, dos Reis M, Hay AJ, Goldstein RA (2009)
- * Identifying Changes in Selective Constraints: Host Shifts in Influenza.
- * PLoS Comput Biol 5(11): e1000564.
- * doi:10.1371/journal.pcbi.1000564
+ * @author Asif Tamuri
+ * @version 1.1
  */
 public class LikelihoodCalculator implements MinimisationFunction{
     private Map<String,CladeModel> cladeModels = new HashMap<String, CladeModel>();
