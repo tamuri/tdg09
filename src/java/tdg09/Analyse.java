@@ -15,6 +15,7 @@ import pal.tree.TreeUtils;
 import tdg09.trees.TreeNodeLabeller;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.Timestamp;
@@ -94,6 +95,11 @@ public class Analyse {
         StringWriter sw = new StringWriter();
         TreeUtils.printNH(tree, new PrintWriter(sw));
         System.out.printf("LabelledTree: >\n  %s\n", sw.toString().replaceAll("\n", "\n  "));
+        try {
+            sw.close();
+        } catch (IOException e) {
+            System.out.println("# Could not close StringWriter.");
+        }
 
         System.out.println("# " + Strings.repeat("-", 80) + "\n");
 
