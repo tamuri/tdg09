@@ -31,7 +31,7 @@ This phylogenetic model uses site-specific amino acid frequencies to distinguish
           Tree in NEWICK format
     ```
     
-3. **Preparing your data:** The program requires a protein sequence alignment in [PHYLIP format](http://www.bioperl.org/wiki/PHYLIP_multiple_alignment_format) and the corresponding tree in [Newick format](http://en.wikipedia.org/wiki/Newick_format). The tree branch lengths should be optimised for an amino acid model, such as WAG, using a program such as [RAxML](http://sco.h-its.org/exelixis/software.html) or [PAML](http://abacus.gene.ucl.ac.uk/software/paml.html). Most importantly, sequence names must be prefixed by a two-letter identifier that is used to indicate it's lineage/grouping. For example, to identify changes in selective constraints between avian and human flu viral proteins, we can prefix every sequence name with 'Av' or 'Hu' to indicate its lineage:
+3. **Preparing your data:** The program requires a protein sequence alignment in [PHYLIP format](http://www.bioperl.org/wiki/PHYLIP_multiple_alignment_format) and the corresponding tree in [Newick format](http://en.wikipedia.org/wiki/Newick_format). The tree branch lengths should be optimised for an amino acid model, such as WAG, using a program such as [RAxML](http://sco.h-its.org/exelixis/software.html) or [PAML](http://abacus.gene.ucl.ac.uk/software/paml.html). Most importantly, sequence names must be prefixed by a two-letter identifier that is used to indicate its lineage/grouping. For example, to identify changes in selective constraints between avian and human flu viral proteins, we can prefix every sequence name with 'Av' or 'Hu' to indicate its lineage:
 
     ```
     $ cat etc/H1.faa
@@ -53,7 +53,7 @@ This is the only way by which the tdg09 program determines which of the differen
 
 4. **Running the program:** The command-line options for the program are:
     + -alignment : the sequence alignment file in PHYLIP format e.g. `etc/H1.faa`
-    + -tree : the tree file in Newisk format e.g. `etc/H1.tree`
+    + -tree : the tree file in Newick format e.g. `etc/H1.tree`
     + -groups : the two-letter identifiers used to partition the sequences e.g. `Av Hu`
     + -threads : specify the numbers of CPU cores/threads to utilise e.g. `2`
     
@@ -100,7 +100,7 @@ This is the only way by which the tdg09 program determines which of the differen
 		Hu:0.0618410)Hu:0.0978830)Hu:0.0436020)Hu:0.0482480)Hu:0.0255390)Hu:0.0362960)
 		Hu:0.0696670)Hu:0.0620790)Hu:0.0268645);   
     ```   
-The output contains a "LabelledTree" that shows the inferred lineage for each ancestral node. This should be checked in a tree viewing program (such as [Dendroscope](http://www-ab.informatik.uni-tuebingen.de/software/dendroscope)) to make sure that the lineages are correct. If not, they can be modified in and the analysis can be rerun with the new, custom-labelled, tree. The output continues:
+The output contains a "LabelledTree" that shows the inferred lineage for each ancestral node. This should be checked in a tree viewing program (such as [Dendroscope](http://www-ab.informatik.uni-tuebingen.de/software/dendroscope)) to make sure that the lineages are correct. If not, they can be modified and the analysis can be rerun with the new, custom-labelled, tree. The output continues:
 
     ```    
     # 2013-03-19 22:44:10.33 - site 1 complete.
@@ -141,11 +141,11 @@ The output contains a "LabelledTree" that shows the inferred lineage for each an
  	```
  	Of interest are the "LrtResults" and "FullResults" tables. 
  	
- 	The LrtResults lists polymorphic sites (on which the non-homogeneous model was estimated) and orders them by the false discovery rate (a correction on the likelihood ratio test P-value required by multiple hypothesis testing). These are sites for which the non-homogeneous model provides a statistically significant improvement over the homogenous model, indicating that the patterns of substitution are different between the two groups/lineages. 
+ 	The LrtResults lists polymorphic sites (on which the non-homogeneous model was estimated) and orders them by the false discovery rate (a correction on the likelihood ratio test P-value required by multiple hypothesis testing). At a given FDR cutoff (e.g. 0.05), these sites are those at which the non-homogeneous model provides a statistically significant improvement over the homogenous model, indicating that the patterns of substitution are different between the different groups/lineages. 
  	
- 	The FullResults table lists further results from all sites. This includes the log-likelihood for the WAG+ssF (site-specific frequencies or *homogeneous model*) and WAG+lssF (lineage and site-specific frequencies or *non-homogeneous model*). Conserved locations are not analysed, so their entries are 'NA'. Finally the output lists the details of the per-location results, such as the amino acid frequencies estimated by the ssF and lssF models.
+ 	The FullResults table lists further results from all sites. This includes the log-likelihood for the WAG+ssF (site-specific frequencies or *homogeneous model*) and WAG+lssF (lineage and site-specific frequencies or *non-homogeneous model*). Conserved locations are not analysed, so their entries are 'NA'. Finally, after the FullResults table, the output file contains details of the per-location results, such as the amino acid frequencies estimated by the ssF and lssF models.
  	
-6. **Analysing the results**: The output file is in [YAML](http://www.yaml.org/) format, which means it can be read by any other programming language that has a YAML parsing library. Here we show an example of analysing the results using the programming language [R](http://www.r-project.org/). The code is available in the `etc/` directory of the download. Start the R console, install and load the *yaml* library, then load the output file using the `yaml.load_file` function:
+6. **Analysing the results**: The output file is in [YAML](http://www.yaml.org/) format, which means it can be read by any other programming language that has a YAML parsing library. Here we show an example of analysing the results using the programming language [R](http://www.r-project.org/). The code is available in the `src/R/example.R` file. Start the R console, install and load the *yaml* library, then load the output file using the `yaml.load_file` function:
 
     ```
     $ R
