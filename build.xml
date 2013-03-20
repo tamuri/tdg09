@@ -1,32 +1,39 @@
 <project name="tdg09" default="dist" basedir=".">
-  <property name="src" location="src/java"/>
-  <property name="build" location="build"/>
-  <property name="dist"  location="dist"/>
 
-  <target name="init">
-    <tstamp/>
-    <mkdir dir="${build}"/>
-  </target>
+    <property name="src.dir" location="src/java"/>
+    <property name="build.dir" location="build"/>
+    <property name="dist.dir" location="dist"/>
+    <property name="libs.dir" location="lib"/>
 
-  <target name="compile" depends="init" description="compile the source " >
-    <javac srcdir="${src}" destdir="${build}">
-        <classpath>
-            <pathelement location="lib/"/>
-            <pathelement path="${java.class.path}/"/>
-            <pathelement path="lib/commons-lang-2.4.jar"/>
-            <pathelement path="lib/flanagan.jar"/>
-            <pathelement path="lib/pal-1.5.1.jar"/>
-          </classpath>
-    </javac>
-  </target>
+    <path id="build.classpath">
+        <fileset dir="${libs.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
 
-  <target name="dist" depends="compile" description="generate the distribution" >
-    <mkdir dir="${dist}"/>
-    <jar jarfile="${dist}/tdg09.jar" basedir="${build}"/>
-  </target>
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+    </target>
 
-  <target name="clean" description="clean up" >
-    <delete dir="${build}"/>
-    <delete dir="${dist}"/>
-  </target>
+    <target name="makedir">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+    </target>
+
+    <target name="compile" depends="clean, makedir">
+        <javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="build.classpath">
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <jar destfile="${dist.dir}\tdg09.jar" basedir="${build.dir}">
+            <zipgroupfileset dir="lib" includes="*.jar"/>
+        </jar>
+    </target>
+
+    <target name="dist" depends="compile, jar">
+        <description>Build everything</description>
+    </target>
+
 </project>
