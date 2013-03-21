@@ -66,7 +66,33 @@ freqs <- freqs / sum(freqs)               # Normalise
 sim_seqs <- simSeq(tree, l=1000, bf=freqs, type="AA", model="WAG", rate=out$HomogeneousRates[site_pos])
 
 # Save the sequence (there is probably a much easier way than this)
-write.dna(file='~/sim_site204.txt', x=toupper(as.character(sim_seqs)), format='sequential', nbcol= -1, colsep='')
+write.dna(file='/Users/Tester/Documents/tdg09/sim_site204.txt', x=toupper(as.character(sim_seqs)), format='sequential', nbcol= -1, colsep='')
 
 # We can analyse the simulated data (1000 sites simulated under site 204's homogeneous model)
 # and use the Cox test to calculate statistical significance of the non-homogeneous model for the real data.
+# 
+# For details, see Goldman, N. (1993). Statistical tests of models of DNA substitution. Journal of Molecular Evolution, 36(2), 182–198.
+#
+# For example, given the original tree in this example (H1.tree) and the simulated data for site 204 (sim_site204.txt),
+# we can analyse the simulated data set using tdg09:
+#
+# java -cp dist/tdg09.jar tdg09.Analyse -tree etc/H1.tree -alignment sim_site204.txt -groups Av Hu -threads 2 > sim204_out.txt
+# 
+# Once complete, read the results of this analysis into R and calculate the Monte Carlo P-value
+ 
+sim_out <- yaml.load_file(input = '/Users/Tester/Documents/tdg09/sim204_out.txt')         # Load results of simulation
+sim_lrt_results <- as.data.frame(matrix(unlist(sim_out$LrtResults), ncol=5, byrow=T))	  # Prepare the likelihood ratio test table (contains delta lnL)
+names(sim_lrt_results) <- c("site", "deltaLnL", "dof", "lrt", "fdr")
+summary(sim_lrt_results$deltaLnL)                                                         # Have a look at the distribution of delta lnL
+
+# What is the Monte Carlo p-value? = (number of simulated delta lnL < delta lnL estimated from real data) / (1 + number of replicates)
+real_data_delta = lrt_results[lrt_results$site == '204', "deltaLnL"]
+pvalue <- 1 - sum(sim_lrt_results$deltaLnL < real_data_delta ) / (1 + length(sim_lrt_results$deltaLnL))
+
+# Plot the Monte Carlo distribution of Delta for the Cox test applied to site 204 of the flu virus H1 protein
+plot(density(sim_lrt_results$deltaLnL), xlim=c(0,25), yaxs='i', ylim=c(0,0.7), xlab=expression(Delta), ylab='', yaxt='n', main='')
+abline(v = real_data_delta, col='red')
+text(x = real_data_delta + 1.0, y = 0.5, pos = 3, labels=bquote(paste(delta, " = ", .(real_data_delta))))
+
+
+
