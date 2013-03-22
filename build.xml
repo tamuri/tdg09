@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <project name="tdg09" default="dist" basedir=".">
 <!-- @author Asif Tamuri
      @version 1.1
@@ -29,7 +30,7 @@
     </target>
 
     <target name="jar" depends="compile">
-        <jar destfile="${dist.dir}\tdg09.jar" basedir="${build.dir}">
+        <jar destfile="${dist.dir}\${ant.project.name}.jar" basedir="${build.dir}">
             <zipgroupfileset dir="lib" includes="*.jar"/>
         </jar>
     </target>
