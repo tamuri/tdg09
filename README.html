@@ -516,11 +516,11 @@ Selective Constraints: Host Shifts in Influenza. <em>PLoS Comput Biol</em> 5(11)
 
 <p> This produces the plot show below. Bars drawn in orange indicate locations with FDR &lt; 0.20, and those locations with FDR &lt; 0.05 have a red dot at their value (we drew the plot with "1 - fdr" values so that smaller FDRs are taller). We can see from this plot a cluster of identified sites at locations 200-210.</p>
 
-<p> <img src="./example_plot.png" alt="image" /></p>
+<p><img src="./figure_fdr_plot.png" alt="image" /></p>
 
 <p> The R code in <code>src/R/example.R</code> also provides an example of using the <a href="http://cran.r-project.org/web/packages/phangorn/index.html">phangorn</a> and <a href="http://cran.r-project.org/web/packages/ape/">ape</a> packages to simulate data under the homogeneous model for a particular site. We can then analyse the synthetic data with the TdG09 software, the parametric bootstrap providing significance of the non-homogeneous model on the original data. For example, here is the Monte Carlo distribution of &Delta; for 1000 parametric bootstrap replicates for flu protein HA (H1) site 204, showing that the homogenous model can be rejected in favour of the non-homogeneous model with P-value &lt; 0.001.</p>
 
-<p><img src="./example_plot2.png" alt="image" /></p></li>
+<p><img src="./figure_cox_plot.png" alt="image" /></p></li>
 </ol>
 
 </body>
