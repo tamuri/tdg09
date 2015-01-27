@@ -67,13 +67,7 @@ public class Utils {
                     double d1 = f.getDouble(o1);
                     double d2 = f.getDouble(o2);
 
-                    if (d1 < d2) {
-                        return -1;
-                    } else if (d1 == d2) {
-                        return 0;
-                    } else {
-                        return 1;
-                    }
+                    return Double.compare(d1, d2);
 
                 } catch (Exception e) {
                     throw new RuntimeException(e);
