@@ -124,6 +124,7 @@ public class Analyse {
                 if (r.models != null && (!r.models.get(0).converged || !r.models.get(1).converged))
                     System.out.print(" (warning: did not converge)");
                 System.out.println();
+                System.out.println("# " + r.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -225,7 +226,7 @@ public class Analyse {
                 polySites.add(r);
 
                 r.lrt = LikelihoodRatioTest.getSignificance(
-                        r.models.get(1).lnL - r.models.get(0).lnL, // delta lnL
+                        Math.abs(r.models.get(1).lnL - r.models.get(0).lnL), // delta lnL
                         r.models.get(1).parameters - r.models.get(0).parameters); // degrees of freedom
             } else {
                 r.lrt = 1.0;
@@ -252,7 +253,7 @@ public class Analyse {
         for (Result r : polySites) {
             System.out.printf("- [ %4d, %s,  %s,   %.7f, %.7f ]%n",
                     r.site,
-                    Strings.padStart(df.format(r.models.get(1).lnL - r.models.get(0).lnL), 10, ' '),
+                    Strings.padStart(df.format(Math.abs(r.models.get(1).lnL - r.models.get(0).lnL)), 10, ' '),
                     r.models.get(1).parameters - r.models.get(0).parameters,
                     r.lrt,
                     r.fdr);

@@ -26,6 +26,17 @@ public class Result {
     public double lrt;
     public double fdr;
 
+    @Override
+    public String toString() {
+        return "Result{" +
+                "site=" + site +
+                ", residues=" + residues +
+                ", models=" + models +
+                ", lrt=" + lrt +
+                ", fdr=" + fdr +
+                '}';
+    }
+
     public Result(int site, Map<Character, Integer> residues, List<Model> models) {
         this.site = site;
         this.residues = residues;
@@ -47,6 +58,18 @@ public class Result {
             this.lnL = lnL;
             this.frequencies = frequencies;
             this.converged = converged;
+        }
+
+        @Override
+        public String toString() {
+            return "Model{" +
+                    "name='" + name + '\'' +
+                    ", parameters=" + parameters +
+                    ", rate=" + rate +
+                    ", lnL=" + lnL +
+                    ", frequencies=" + frequencies +
+                    ", converged=" + converged +
+                    '}';
         }
 
         public List<List<Double>> getFlatFrequencies() {
