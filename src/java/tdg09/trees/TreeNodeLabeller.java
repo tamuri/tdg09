@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Collections;
 
 /**
  * Takes a tree where taxa have been prefixed by a two-letter partition/group identifier and traverses the tree to
@@ -90,6 +91,10 @@ public class TreeNodeLabeller {
         }
 
         // now the only remaining unknown nodes are those that neighbour two different clades (and the root node)
+
+	// Iterate over unknownNodes in reverse to make sure the parent nodes are labelled before child nodes
+	Collections.reverse(unknownNodes);
+
         for (Node n : unknownNodes) {
             // the name of this hostshift node = parent node name (remember, could be the root node = leave unlabelled)
             if (n.getParent() != null) {
