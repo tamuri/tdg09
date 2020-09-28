@@ -269,7 +269,15 @@ public class Analyse {
             System.out.printf("Alignment:\n  SequenceCount: %s\n  SiteCount: %s\n\n", alignment.getSequenceCount(), alignment.getSiteCount());
         }
 
-        // 2. Check that all taxa have an assigned group and all groups are used
+	// 2. Check that group names have the right length
+	for (String group : options.groups) {
+	    if (group.length() > 2) {
+		System.out.println("ERROR: Group names must be at most two characters long.");
+		System.exit(1);
+	    }
+	}
+
+        // 3. Check that all taxa have an assigned group and all groups are used
         List<String> taxa = Lists.newArrayList();
         Set<String> usedGroups = Sets.newHashSet();
 
